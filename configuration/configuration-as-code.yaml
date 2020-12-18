@@ -105,7 +105,7 @@ jobs:
 
               // Filter by name (with regular expression)
               traits << 'jenkins.scm.impl.trait.RegexSCMSourceFilterTrait' {
-                  regex('(jenkins-poc|none)')
+                  regex('(jenkins-poc|ccmb-workflow)')
               }
 
               // Discover pull requests from origin
