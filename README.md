@@ -14,6 +14,24 @@ Use the extended [jenkins image from dockerhub](https://hub.docker.com/r/jenkins
     docker build --build-arg BUILD_DATE=`date -u +”%Y-%m-%dT%H:%M:%SZ”` --build-arg VCS_REF=`git rev-parse --short HEAD` -t williamjds/ccmb-jenkins:latest .
     ```
 
+## Webhook integration for jenkins behind firewall
+
+For receiving webhooks behind a firewall, red the docker steps for [Production-ready Github and Jenkins setup behind a firewall](https://webhookrelay.com/v1/tutorials/github-webhooks-jenkins-vm.html).
+You will need to
+* signup to [https://webhookrelay.com/](https://webhookrelay.com/)
+* install the CLI for webhookrelay
+* create a webhookrelay key and secret
+* setup a webhook relay bucket and public endpoint for forwarding webhooks
+* download the agent docker image [webhookrelay/webhookrelayd](https://hub.docker.com/r/webhookrelay/webhookrelayd) from dockerhub
+    ```
+    docker pull webhookrelay/webhookrelayd
+    ```
+  
+:warning: The components in the docker-compose setup can reach each other via the name of the service in the `docker-compose.yml` as hostname. The relay forward in this example needs to point to the service `jenkins`. See [Docker Networking in Compose](https://docs.docker.com/compose/networking/)) 
+```
+relay forward --bucket github-jenkins-compose http://jenkins:8080/github-webhook/ --no-agent
+```
+
 ## Docker compose
 There is a great tutorial on [How To Automate Jenkins Setup with Docker and Jenkins Configuration as Code](https://www.digitalocean.com/community/tutorials/how-to-automate-jenkins-setup-with-docker-and-jenkins-configuration-as-code).
 The docker-compse.yml in this repository combines the basic setup from this tutorial with the webhookrelay setup and a configuration server. For docker-compose to work with this setup, create a file named `.env` in the top directory (ignored by git) which contains the following secrets:
