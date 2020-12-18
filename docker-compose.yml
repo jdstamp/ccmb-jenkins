@@ -1,0 +1,42 @@
+version: '3.2'
+services:
+  relay:
+    container_name: webhookrelay
+    image: webhookrelay/webhookrelayd:latest
+    network_mode: host # required if you want to access other services running on localhost (otherwise localhost would be inside this container)
+    restart: always
+    environment:
+      # Authentication
+      - RELAY_KEY=${RELAY_KEY}
+      - RELAY_SECRET=${RELAY_SECRET}
+      # buckets list to subscribe
+      - BUCKETS=${BUCKETS}
+  jenkins:
+    container_name: ccmb-jenkins
+    image: williamjds/ccmb-jenkins:latest
+    restart: always
+    ports:
+      - 8080:8080
+      - 50000:50000
+    environment:
+      # in docker compose the containers are on the same network and can be addressed by their names as hostname: configuration-server
+      - CASC_JENKINS_CONFIG=http://configuration-server:9000/configuration-as-code.yaml
+      - JENKINS_ADMIN_ID=${JENKINS_ADMIN_ID}
+      - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD}
+      - BROWN_ACCOUNT_USER=${BROWN_ACCOUNT_USER}
+      - BROWN_ACCOUNT_PASSWORD=${BROWN_ACCOUNT_PASSWORD}
+      - GITHUB_ACCOUNT_USER=${GITHUB_ACCOUNT_USER}
+      - GITHUB_ACCOUNT_PASSWORD=${GITHUB_ACCOUNT_PASSWORD}
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+    volumes:
+      - /tmp/jenkins_data:/var/jenkins_home
+  configuration-server:
+    container_name: configuration-server
+    image: php
+    restart: always
+    ports:
+      - 9000:9000
+    working_dir: /var/www/html
+    command: php -S 0.0.0.0:9000
+    volumes:
+      - ./configuration/:/var/www/html

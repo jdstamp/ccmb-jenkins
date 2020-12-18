@@ -1,0 +1,121 @@
+jenkins:
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+       - id: ${JENKINS_ADMIN_ID}
+         password: ${JENKINS_ADMIN_PASSWORD}
+  authorizationStrategy:
+    globalMatrix:
+      permissions:
+        - "Overall/Administer:admin"
+        - "Overall/Read:authenticated"
+  remotingSecurity:
+      enabled: true
+
+security:
+  queueItemAuthenticator:
+    authenticators:
+    - global:
+        strategy: triggeringUsersAuthorizationStrategy
+
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+      - usernamePassword:
+          id: 'brown-account'
+          username: ${BROWN_ACCOUNT_USER}
+          password: ${BROWN_ACCOUNT_PASSWORD}
+          description: 'Brown account for oscar jobs'
+          scope: GLOBAL
+      - usernamePassword:
+          id: 'github-account'
+          username: ${GITHUB_ACCOUNT_USER}
+          password: ${GITHUB_ACCOUNT_PASSWORD}
+          description: 'Github user account'
+          scope: GLOBAL
+      - string:
+          id: 'webhook-secret'
+          secret: ${GITHUB_WEBHOOK_SECRET}
+          description: 'Webhook secret'
+          scope: GLOBAL
+
+
+unclassified:
+  location:
+    url: http://localhost:8080/
+
+jobs:
+  - script: >
+      organizationFolder('github-jdstamp') {
+          description("My personal organizational folder")
+          displayName('Github/jdstamp')
+          // "Projects"
+          organizations {
+              github {
+                  // Specify the name of the GitHub Organization or GitHub User Account.
+                  repoOwner('jdstamp')
+                  // The server to connect to.
+                  apiUri('https://api.github.com')
+                  credentialsId('github-account')
+              }
+          }
+          projectFactories {
+
+              workflowMultiBranchProjectFactory {
+                  // Relative location within the checkout of your Pipeline script.
+                  scriptPath('oscar.Jenkinsfile')
+              }
+
+          }
+
+          // "Orphaned Item Strategy"
+          orphanedItemStrategy {
+              discardOldItems {
+                  daysToKeep(1)
+                  numToKeep(2)
+              }
+          }
+
+          triggers {
+              // Some kinds of folders are reindexed automatically and immediately upon receipt of an external event.
+              periodicFolderTrigger {
+                  // The maximum amount of time since the last indexing that is allowed to elapse before an indexing is triggered.
+                  interval('1d')
+
+              }
+
+          }
+
+          // "Traits" ("Behaviours" in the GUI) that are NOT "declarative-compatible"
+          // For some 'traits, we need to configure this stuff by hand until JobDSL handles it
+          // https://issues.jenkins.io/browse/JENKINS-45504
+          configure { node ->
+              def traits = node / navigators / 'org.jenkinsci.plugins.github__branch__source.GitHubSCMNavigator' / traits
+
+              // Discover branches
+              traits << 'org.jenkinsci.plugins.github__branch__source.BranchDiscoveryTrait' {
+                  strategyId('3')
+                  // Values
+                  //  1 : Exclude branches that are also filed as PRs
+                  //  2 : Only branches that are also filed as PRs
+                  //  3 : All branches
+              }
+
+              // Filter by name (with regular expression)
+              traits << 'jenkins.scm.impl.trait.RegexSCMSourceFilterTrait' {
+                  regex('(jenkins-poc|none)')
+              }
+
+              // Discover pull requests from origin
+              traits << 'org.jenkinsci.plugins.github__branch__source.OriginPullRequestDiscoveryTrait' {
+                  strategyId('2')
+                  // Values
+                  // 1 : Merging the pull request with the current target branch revision
+                  // 2 : The current pull request revision
+                  // 3 : Both the current pull request revision and the pull request merged with the current target branch revision
+              }
+
+          }
+      }
