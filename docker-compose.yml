@@ -3,7 +3,6 @@ services:
   relay:
     container_name: webhookrelay
     image: webhookrelay/webhookrelayd:latest
-    network_mode: host # required if you want to access other services running on localhost (otherwise localhost would be inside this container)
     restart: always
     environment:
       # Authentication
