@@ -1,6 +1,10 @@
 # ccmb-jenkins
 Basic setup for running a local jenkins on docker.
 
+The goal of this project is workflow automation. The setup in this project allows to automatically submit jobs to a remote computing cluster when code is pushed to github.
+
+![Workflow automation with Github and Jenkins.](ccmb-jenkins.png)
+
 ## Extended jenkins image
 Use the extended [jenkins image from dockerhub](https://hub.docker.com/r/jenkins/jenkins) with installed plugins.
 
