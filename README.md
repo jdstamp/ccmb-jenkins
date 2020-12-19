@@ -20,7 +20,7 @@ Use the extended [jenkins image from dockerhub](https://hub.docker.com/r/jenkins
 
 ## Webhook integration for jenkins behind firewall
 
-For receiving webhooks behind a firewall, red the docker steps for [Production-ready Github and Jenkins setup behind a firewall](https://webhookrelay.com/v1/tutorials/github-webhooks-jenkins-vm.html).
+For receiving webhooks behind a firewall, read the docker steps for [Production-ready Github and Jenkins setup behind a firewall](https://webhookrelay.com/v1/tutorials/github-webhooks-jenkins-vm.html).
 You will need to
 * signup to [https://webhookrelay.com/](https://webhookrelay.com/)
 * install the CLI for webhookrelay
@@ -62,7 +62,7 @@ For starting a local jenkins, configuration server, and webhookrealy agent, run
 The configuration as code plugin is preinstalled in this image. With this, it is possible to configure jobs on the jenkins instance. 
 
 #### Configuration server in docker compose
-A neat solution that allows to update configuration is to server the configuration file via php server. In this setup, a php server serves the configuration directory in this repository. It can be replaced by providing this directory via volume mount.
+A solution that allows to update configuration in a running jenkins instance is to server the configuration file via a server. In this setup, a php server serves the configuration directory in this repository. It can be simplified by providing this directory via volume mount.
 In the configuration as code setup, the URL to the initial configuration file needs to be configured via the environment variable `CASC_JENKINS_CONFIG`. Since the `ccmb-jenkins` container is sharing a network with the configuration server as part of the docker compose setup, the configuration server can be addressed via the docker compose name of the service. The URL can look like this:
 ```dotenv
 CASC_JENKINS_CONFIG=http://configuration-server:9000/configuration-as-code.yaml
