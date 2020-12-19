@@ -31,7 +31,7 @@ You will need to
     docker pull webhookrelay/webhookrelayd
     ```
   
-:warning: The components in the docker-compose setup can reach each other via the name of the service in the `docker-compose.yml` as hostname. The relay forward in this example needs to point to the service `jenkins`. See [Docker Networking in Compose](https://docs.docker.com/compose/networking/)) 
+:warning: The components in the docker-compose setup can reach each other via the name of the service in the `docker-compose.yml` as hostname. The relay forward in this example needs to point to the service `jenkins`. See [Docker Networking in Compose](https://docs.docker.com/compose/networking/) 
 ```
 relay forward --bucket github-jenkins-compose http://jenkins:8080/github-webhook/ --no-agent
 ```
@@ -52,6 +52,8 @@ GITHUB_ACCOUNT_PASSWORD=
 GITHUB_WEBHOOK_SECRET=
 ```
 The secrets are required to successfully setup a basic admin user, integrate the webhook forwarding, and configure credentials for Github and Brown accounts.
+
+Update the jenkins volume mount to a directory of your choice or create the directory `/tmp/jenkins_data`.
 
 For starting a local jenkins, configuration server, and webhookrealy agent, run
  ```shell script
