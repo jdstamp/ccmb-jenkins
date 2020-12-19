@@ -19,7 +19,7 @@ services:
       - 50000:50000
     environment:
       # in docker compose the containers are on the same network and can be addressed by their names as hostname: configuration-server
-      - CASC_JENKINS_CONFIG=http://configuration-server:9000/configuration-as-code.yaml
+      - CASC_JENKINS_CONFIG=/usr/local/configuration/configuration-as-code.yaml
       - JENKINS_ADMIN_ID=${JENKINS_ADMIN_ID}
       - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD}
       - BROWN_ACCOUNT_USER=${BROWN_ACCOUNT_USER}
@@ -29,13 +29,4 @@ services:
       - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
     volumes:
       - /tmp/jenkins_data:/var/jenkins_home
-  configuration-server:
-    container_name: configuration-server
-    image: php
-    restart: always
-    ports:
-      - 9000:9000
-    working_dir: /var/www/html
-    command: php -S 0.0.0.0:9000
-    volumes:
-      - ./configuration/:/var/www/html
+      - ./configuration:/usr/local/configuration

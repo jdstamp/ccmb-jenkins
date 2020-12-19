@@ -63,13 +63,10 @@ For starting a local jenkins, configuration server, and webhookrealy agent, run
 ### Configuration as code
 The configuration as code plugin is preinstalled in this image. With this, it is possible to configure jobs on the jenkins instance. 
 
-#### Configuration server in docker compose
-A solution that allows to update configuration in a running jenkins instance is to server the configuration file via a server. In this setup, a php server serves the configuration directory in this repository. It can be simplified by providing this directory via volume mount.
-In the configuration as code setup, the URL to the initial configuration file needs to be configured via the environment variable `CASC_JENKINS_CONFIG`. Since the `ccmb-jenkins` container is sharing a network with the configuration server as part of the docker compose setup, the configuration server can be addressed via the docker compose name of the service. The URL can look like this:
+#### Configuration via volume mount
+A solution that allows to update configuration in a running jenkins instance is to mount the configuration directory in this repository via volume mount.
+In the configuration as code setup, the URL to the initial configuration file needs to be configured via the environment variable `CASC_JENKINS_CONFIG`. 
 ```dotenv
-CASC_JENKINS_CONFIG=http://configuration-server:9000/configuration-as-code.yaml
+CASC_JENKINS_CONFIG=/usr/local/configuration/configuration-as-code.yaml
 ```
 With the configuration directory mounted als volume to the configuration server, the content can be updated and applied via the GUI for configuration as code in a running jenkins instance.
-
-#### Configuration via volume mount
-Alternatively, you can mount the configuration file as volume to the `ccmb-jenkins` container. Extend the docker compose file section and add a volume mount. Redirect the `CASC_JENKINS_CONFIG` environment variable to target mount destination inside the jenkins container.
