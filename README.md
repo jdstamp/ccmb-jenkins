@@ -70,3 +70,8 @@ In the configuration as code setup, the URL to the initial configuration file ne
 CASC_JENKINS_CONFIG=/usr/local/configuration/configuration-as-code.yaml
 ```
 With the configuration directory mounted als volume to the configuration server, the content can be updated and applied via the GUI for configuration as code in a running jenkins instance.
+
+:bulb: Another way to fetch configuration is by using any configuration file on the web, e.g. the github repository on the web:
+```dotenv
+CASC_JENKINS_CONFIG=https://raw.githubusercontent.com/jdstamp/ccmb-jenkins/main/configuration/configuration-as-code.yaml
+```
