@@ -1,0 +1,31 @@
+defaultEntryPoints = ["http", "https"]
+
+[entryPoints]
+  [entryPoints.dashboard]
+    address = ":8080"
+    [entryPoints.dashboard.auth]
+      [entryPoints.dashboard.auth.basic]
+        users = ["admin:$apr1$/dqAVsZm$94knPscmU3F0.uRfuyrj.0"]
+  [entryPoints.http]
+    address = ":80"
+      [entryPoints.http.redirect]
+        entryPoint = "https"
+  [entryPoints.https]
+    address = ":443"
+      [entryPoints.https.tls]
+
+[api]
+entrypoint="dashboard"
+
+[acme]
+email = "julian.d.stamp@gmail.com"
+storage = "acme.json"
+entryPoint = "https"
+onHostRule = true
+  [acme.httpChallenge]
+  entryPoint = "http"
+
+[docker]
+domain = "localhost"
+watch = true
+network = "web"

@@ -75,3 +75,10 @@ With the configuration directory mounted als volume to the configuration server,
 ```dotenv
 CASC_JENKINS_CONFIG=https://raw.githubusercontent.com/jdstamp/ccmb-jenkins/main/configuration/configuration-as-code.yaml
 ```
+
+
+## Reverse Proxy
+https://traefik.io/blog/traefik-2-tls-101-23b4fbee81f1/
+https://www.digitalocean.com/community/tutorials/how-to-use-traefik-as-a-reverse-proxy-for-docker-containers-on-ubuntu-18-04
+https://github.com/DoTheEvo/Traefik-v2-examples
+https://www.digitalocean.com/community/tutorials/how-to-use-traefik-v2-as-a-reverse-proxy-for-docker-containers-on-ubuntu-20-04

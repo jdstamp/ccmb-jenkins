@@ -1,22 +1,28 @@
 version: '3.2'
+networks:
+  web:
+    external: true
+  internal:
+    external: false
 services:
-  relay:
-    container_name: webhookrelay
-    image: webhookrelay/webhookrelayd:latest
+  traefik:
+    container_name: traefik
+    image: traefik:v2.2
     restart: always
-    environment:
-      # Authentication
-      - RELAY_KEY=${RELAY_KEY}
-      - RELAY_SECRET=${RELAY_SECRET}
-      # buckets list to subscribe
-      - BUCKETS=${BUCKETS}
+    ports:
+    - 80:80
+    - 443:443
+    networks:
+      - web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - $PWD/traefik-v2.2.toml:/traefik.toml
+      - $PWD/traefik_dynamic.toml:/traefik_dynamic.toml
+      - $PWD/acme.json:/acme.json
   jenkins:
     container_name: ccmb-jenkins
     image: williamjds/ccmb-jenkins:latest
     restart: always
-    ports:
-      - 8080:8080
-      - 50000:50000
     environment:
       # in docker compose the containers are on the same network and can be addressed by their names as hostname: configuration-server
       - CASC_JENKINS_CONFIG=/usr/local/configuration/configuration-as-code.yaml
@@ -27,6 +33,17 @@ services:
       - GITHUB_ACCOUNT_USER=${GITHUB_ACCOUNT_USER}
       - GITHUB_ACCOUNT_PASSWORD=${GITHUB_ACCOUNT_PASSWORD}
       - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+    labels:
+      - traefik.http.routers.jenkins.rule=Host(`jenkins.localhost`)
+      - traefik.http.routers.jenkins.tls=true
+      - traefik.http.routers.jenkins.tls.certresolver=lets-encrypt
+      - traefik.docker.network=web
+      - traefik.port=8080
+      - "traefik.frontend.headers.SSLProxyHeaders=X-Forwarded-Proto: https"
+      - traefik.frontend.headers.SSLRedirect=true
+    networks:
+      - internal
+      - web
     volumes:
-      - /tmp/jenkins_data:/var/jenkins_home
+      - ./jenkins_data:/var/jenkins_home
       - ./configuration:/usr/local/configuration
